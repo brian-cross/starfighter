@@ -1,10 +1,15 @@
 import arcade
 from random import random, randrange
 
-STARS_MIN = 100
-STARS_MAX = 125
-STAR_RADIUS_MIN = 2
-STAR_RADIUS_MAX = 6
+SMALL_STARS_MIN = 300
+SMALL_STARS_MAX = 500
+SMALL_STAR_RADIUS_MIN = 1
+SMALL_STAR_RADIUS_MAX = 3
+
+LARGE_STARS_MIN = 5
+LARGE_STARS_MAX = 10
+LARGE_STAR_RADIUS_MIN = 4
+LARGE_STAR_RADIUS_MAX = 10
 
 
 class Starfield(arcade.ShapeElementList):
@@ -21,6 +26,9 @@ class Starfield(arcade.ShapeElementList):
     def __init__(self, width, height):
         super().__init__()
 
+        self.width = width
+        self.height = height
+
         # Create the background color and append to the shape list.
         bg_points = [(0, height), (width, height), (width, 0), (0, 0)]
         bg_color_top = arcade.color.BLACK
@@ -31,13 +39,20 @@ class Starfield(arcade.ShapeElementList):
                                                              bg_colors)
         self.append(bg_rect)
 
+        # Generate a large number of small stars and a few big ones.
+        self.generate_stars(SMALL_STARS_MIN, SMALL_STARS_MAX,
+                            SMALL_STAR_RADIUS_MIN, SMALL_STAR_RADIUS_MAX)
+        self.generate_stars(LARGE_STARS_MIN, LARGE_STARS_MAX,
+                            LARGE_STAR_RADIUS_MIN, LARGE_STAR_RADIUS_MAX)
+
+    def generate_stars(self, min, max, r_min, r_max):
         # Create each star and append to the list.
-        number_of_stars = randrange(STARS_MIN, STARS_MAX, step=1)
+        number_of_stars = randrange(min, max, step=1)
 
         for _ in range(number_of_stars):
-            x = random() * width
-            y = random() * height
-            radius = randrange(STAR_RADIUS_MIN, STAR_RADIUS_MAX, step=1)
+            x = random() * self.width
+            y = random() * self.height
+            radius = randrange(r_min, r_max, step=1)
             star = arcade.create_ellipse_filled_with_colors(
                 x, y, radius, radius, (0, 0, 0, 0), arcade.color.WHITE)
             self.append(star)
