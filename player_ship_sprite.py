@@ -6,7 +6,7 @@ import math
 import constants
 
 
-class ShipSprite(arcade.Sprite):
+class PlayerShipSprite(arcade.Sprite):
     def __init__(self, filename, scale=1.0):
         super().__init__(filename, scale)
 

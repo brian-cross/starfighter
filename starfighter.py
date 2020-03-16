@@ -4,7 +4,8 @@ import math
 
 import constants
 from starfield import Starfield
-from ship_sprite import ShipSprite
+from player_ship_sprite import PlayerShipSprite
+from enemy_ship_sprite import EnemyShipSprite
 
 
 class App(arcade.Window):
@@ -23,15 +24,21 @@ class App(arcade.Window):
 
         # Setup sprite lists.
         self.all_sprites_list = arcade.SpriteList()
+        self.enemy_ships_sprite_list = arcade.SpriteList()
 
     def setup(self):
         # Create the background and star field.
         self.background = Starfield(self.width, self.height)
 
         # Create the player ship.
-        self.player_ship = ShipSprite(
+        self.player_ship = PlayerShipSprite(
             constants.PLAYER_SHIP_FILENAME, constants.PLAYER_SHIP_SCALING)
         self.all_sprites_list.append(self.player_ship)
+
+        # Create an enemy ship
+        self.enemy_ship = EnemyShipSprite(scale=constants.ENEMY_SHIP_SCALING)
+        self.enemy_ships_sprite_list.append(self.enemy_ship)
+        self.all_sprites_list.append(self.enemy_ship)
 
     def on_draw(self):
         arcade.start_render()
