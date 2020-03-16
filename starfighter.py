@@ -33,12 +33,14 @@ class App(arcade.Window):
         # Create the player ship.
         self.player_ship = PlayerShipSprite(
             constants.PLAYER_SHIP_FILENAME, constants.PLAYER_SHIP_SCALING)
-        self.all_sprites_list.append(self.player_ship)
 
-        # Create an enemy ship
+        # Create an enemy ship.
         self.enemy_ship = EnemyShipSprite(scale=constants.ENEMY_SHIP_SCALING)
         self.enemy_ships_sprite_list.append(self.enemy_ship)
+
+        # Add the sprites to the list to be drawn in a bottom to top order.
         self.all_sprites_list.append(self.enemy_ship)
+        self.all_sprites_list.append(self.player_ship)
 
     def on_draw(self):
         arcade.start_render()
