@@ -43,13 +43,17 @@ class App(arcade.Window):
         self.all_sprites_list.append(self.player_ship)
 
     def on_draw(self):
+        # Draws everything to the screen.
         arcade.start_render()
 
-        # Draw everything.
         self.background.draw()
         self.all_sprites_list.draw()
 
     def on_update(self, delta_time):
+        for enemy_ship in self.enemy_ships_sprite_list:
+            enemy_ship.target_x = self.player_ship.center_x
+            enemy_ship.target_y = self.player_ship.center_y
+
         # Update everything on each frame.
         self.all_sprites_list.update()
 
