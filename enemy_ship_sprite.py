@@ -66,11 +66,12 @@ class EnemyShipSprite(arcade.Sprite):
     def update(self):
         super().update()
 
+        # Aim the enemy ship at the target.
         dx = self.center_x - self.target_x
         dy = self.center_y - self.target_y
 
         self.angle = math.degrees(math.atan2(dy, dx)) - 90
 
-        # Calculate the x and y speeds based on the ship speed and angle
+        # Calculate the x and y speeds based on the ship speed and angle.
         self.change_y = math.sin(math.radians(self.angle - 90)) * self.speed
         self.change_x = math.cos(math.radians(self.angle - 90)) * self.speed

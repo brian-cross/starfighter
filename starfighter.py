@@ -50,6 +50,7 @@ class App(arcade.Window):
         self.all_sprites_list.draw()
 
     def on_update(self, delta_time):
+        # Update the enemy ships with the player ship's current location.
         for enemy_ship in self.enemy_ships_sprite_list:
             enemy_ship.target_x = self.player_ship.center_x
             enemy_ship.target_y = self.player_ship.center_y
