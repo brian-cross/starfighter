@@ -70,7 +70,21 @@ class EnemyShipSprite(arcade.Sprite):
         dx = self.center_x - self.target_x
         dy = self.center_y - self.target_y
 
-        self.angle = math.degrees(math.atan2(dy, dx)) - 90
+        # If the change in angle from the last update is greater than 10
+        # degrees, limit the rate of change of angle to max 10 degrees per
+        # frame. Prevents the enemy ship from instantaneously flipping if the
+        # player exits the screen and appears on the other side.
+        prev_angle = self.angle
+        target_angle = math.degrees(math.atan2(dy, dx)) - 90
+
+        d_theta = prev_angle - target_angle
+
+        if ((d_theta > 10) and (d_theta < 350)):
+            self.angle += 10
+        elif ((d_theta < -10) and (d_theta > -350)):
+            self.angle += -10
+        else:
+            self.angle = target_angle
 
         # Calculate the x and y speeds based on the ship speed and angle.
         self.change_y = math.sin(math.radians(self.angle - 90)) * self.speed
