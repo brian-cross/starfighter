@@ -11,6 +11,7 @@ ENEMY_SHIP_SCALING = SPRITE_SCALING
 # Player ship motion properties
 PLAYER_SHIP_THRUST = 0.3
 PLAYER_SHIP_DRAG = 0.1
+PLAYER_LASER_SPEED = 10
 
 # File paths
 IMAGES_DIR = 'assets/images'
@@ -18,3 +19,5 @@ PLAYER_SPRITES_DIR = f'{IMAGES_DIR}/player_sprites'
 ENEMY_SPRITES_DIR = f'{IMAGES_DIR}/enemy_sprites'
 LASER_SPRITES_DIR = f'{IMAGES_DIR}/laser_sprites'
 PLAYER_SHIP_FILENAME = f'{PLAYER_SPRITES_DIR}/player_ship.png'
+PLAYER_LASER_FILENAME = f'{LASER_SPRITES_DIR}/laserRed01.png'
+ENEMY_LASER_FILENAME = f'{LASER_SPRITES_DIR}/laserBlue01.png'

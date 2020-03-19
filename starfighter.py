@@ -6,6 +6,7 @@ import constants
 from starfield import Starfield
 from player_ship_sprite import PlayerShipSprite
 from enemy_ship_sprite import EnemyShipSprite
+from laser import Laser
 
 
 class App(arcade.Window):
@@ -25,6 +26,7 @@ class App(arcade.Window):
         # Setup sprite lists.
         self.all_sprites_list = arcade.SpriteList()
         self.enemy_ships_sprite_list = arcade.SpriteList()
+        self.laser_sprite_list = arcade.SpriteList()
 
     def setup(self):
         # Create the background and star field.
@@ -59,6 +61,7 @@ class App(arcade.Window):
         self.all_sprites_list.update()
 
     def on_key_press(self, key, modifiers):
+        print(key)
         # Handle keyboard presses.
         if (key == arcade.key.W or key == arcade.key.UP):
             self.player_ship.thrust = constants.PLAYER_SHIP_THRUST
@@ -72,6 +75,8 @@ class App(arcade.Window):
             # Persist the state of the right turning key
             self.is_right_pressed = True
             self.player_ship.change_angle = -3
+        elif (key == arcade.key.ENTER):
+            self.fire_weapon()
 
     def on_key_release(self, key, modifiers):
         # Handles the key release event.
@@ -94,6 +99,17 @@ class App(arcade.Window):
         elif (key == arcade.key.W or key == arcade.key.UP or key == arcade.key.S or key == arcade.key.DOWN):
             self.player_ship.thrust = 0
             self.player_ship.drag = constants.PLAYER_SHIP_DRAG
+
+    def fire_weapon(self):
+        laser_speed = self.player_ship.speed + constants.PLAYER_LASER_SPEED
+        laser = Laser(constants.ENEMY_LASER_FILENAME,
+                      self.player_ship.center_x,
+                      self.player_ship.center_y,
+                      laser_speed,
+                      self.player_ship.angle)
+
+        self.all_sprites_list.append(laser)
+        self.laser_sprite_list.append(laser)
 
 
 if __name__ == "__main__":
