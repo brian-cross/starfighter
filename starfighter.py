@@ -7,6 +7,7 @@ from starfield import Starfield
 from player_ship_sprite import PlayerShipSprite
 from enemy_ship_sprite import EnemyShipSprite
 from laser import Laser
+from explosion import Explosion
 
 
 class App(arcade.Window):
@@ -27,6 +28,12 @@ class App(arcade.Window):
         self.all_sprites_list = arcade.SpriteList()
         self.enemy_ships_sprite_list = arcade.SpriteList()
         self.laser_sprite_list = arcade.SpriteList()
+        self.explosion_sprite_list = arcade.SpriteList()
+
+        # Load the spritesheet for the explosion animation
+        self.explosion_texture_list = arcade.load_spritesheet(constants.EXPLOSION_FILENAME,
+                                                              constants.EXPLOSION_SPRITESHEET_WIDTH, constants.EXPLOSION_SPRITESHEET_HEIGHT,
+                                                              constants.EXPLOSION_SPRITESHEET_COLUMNS, constants.EXPLOSION_SPRITESHEET_COUNT)
 
     def setup(self):
         # Create the background and star field.
@@ -50,6 +57,7 @@ class App(arcade.Window):
 
         self.background.draw()
         self.all_sprites_list.draw()
+        self.explosion_sprite_list.draw()
 
     def on_update(self, delta_time):
         # Update the enemy ships with the player ship's current location.
@@ -61,6 +69,7 @@ class App(arcade.Window):
 
         # Update everything on each frame.
         self.all_sprites_list.update()
+        self.explosion_sprite_list.update()
 
     def on_key_press(self, key, modifiers):
         # Handle keyboard presses.
@@ -121,9 +130,18 @@ class App(arcade.Window):
         for laser in self.laser_sprite_list:
             hit_list = laser.collides_with_list(self.enemy_ships_sprite_list)
             if (len(hit_list) > 0):
+                self.make_explosion(hit_list[0])
                 laser.remove_from_sprite_lists()
                 for hit in hit_list:
                     hit.remove_from_sprite_lists()
+
+    def make_explosion(self, sprite):
+        # Create an explosion at the location of the specified sprite.
+        explosion = Explosion(self.explosion_texture_list)
+        explosion.center_x = sprite.center_x
+        explosion.center_y = sprite.center_y
+        explosion.update()
+        self.explosion_sprite_list.append(explosion)
 
 
 if __name__ == "__main__":
