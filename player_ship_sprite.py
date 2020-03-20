@@ -12,6 +12,7 @@ class PlayerShipSprite(arcade.Sprite):
 
         self.center_x = constants.SCREEN_WIDTH / 2
         self.center_y = constants.SCREEN_HEIGHT / 2
+        self.angle = 90
 
         self.thrust = 0
         self.drag = 0
@@ -38,8 +39,8 @@ class PlayerShipSprite(arcade.Sprite):
                 self.speed = 0
 
         # Calculate the x and y speeds based on the ship speed and angle
-        self.change_y = math.sin(math.radians(self.angle + 90)) * self.speed
-        self.change_x = math.cos(math.radians(self.angle + 90)) * self.speed
+        self.change_y = math.sin(math.radians(self.angle)) * self.speed
+        self.change_x = math.cos(math.radians(self.angle)) * self.speed
 
         # If the ship goes off screen, move it to the opposite side
         if self.right < 0:

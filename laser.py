@@ -15,5 +15,11 @@ class Laser(arcade.Sprite):
 
     def update(self):
         super().update()
-        self.change_y = math.sin(math.radians(self.angle + 90)) * self.speed
-        self.change_x = math.cos(math.radians(self.angle + 90)) * self.speed
+
+        # If the laser goes off screen then remove it.
+        if (self.bottom > constants.SCREEN_HEIGHT or self.top < 0 or
+                self.left > constants.SCREEN_WIDTH or self.left < 0):
+            self.remove_from_sprite_lists()
+
+        self.change_y = math.sin(math.radians(self.angle)) * self.speed
+        self.change_x = math.cos(math.radians(self.angle)) * self.speed

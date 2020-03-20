@@ -57,11 +57,12 @@ class App(arcade.Window):
             enemy_ship.target_x = self.player_ship.center_x
             enemy_ship.target_y = self.player_ship.center_y
 
+        self.check_for_collisions()
+
         # Update everything on each frame.
         self.all_sprites_list.update()
 
     def on_key_press(self, key, modifiers):
-        print(key)
         # Handle keyboard presses.
         if (key == arcade.key.W or key == arcade.key.UP):
             self.player_ship.thrust = constants.PLAYER_SHIP_THRUST
@@ -101,6 +102,8 @@ class App(arcade.Window):
             self.player_ship.drag = constants.PLAYER_SHIP_DRAG
 
     def fire_weapon(self):
+        # Break the laws of physics by adding the speed of the ship to the
+        # speed of the laser. (Looks better than having a constant laser speed)
         laser_speed = self.player_ship.speed + constants.PLAYER_LASER_SPEED
         laser = Laser(constants.ENEMY_LASER_FILENAME,
                       self.player_ship.center_x,
@@ -108,8 +111,19 @@ class App(arcade.Window):
                       laser_speed,
                       self.player_ship.angle)
 
-        self.all_sprites_list.append(laser)
+        # Insert the sprite at the start of the list so it's drawn under the
+        # ships.
+        self.all_sprites_list.insert(0, laser)
         self.laser_sprite_list.append(laser)
+
+    def check_for_collisions(self):
+        # See if a laser hits an enemy ship.
+        for laser in self.laser_sprite_list:
+            hit_list = laser.collides_with_list(self.enemy_ships_sprite_list)
+            if (len(hit_list) > 0):
+                laser.remove_from_sprite_lists()
+                for hit in hit_list:
+                    hit.remove_from_sprite_lists()
 
 
 if __name__ == "__main__":
