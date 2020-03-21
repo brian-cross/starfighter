@@ -137,7 +137,8 @@ class App(arcade.Window):
 
     def make_explosion(self, sprite):
         # Create an explosion at the location of the specified sprite.
-        explosion = Explosion(self.explosion_texture_list)
+        explosion = Explosion(self.explosion_texture_list,
+                              constants.SPRITE_SCALING)
         explosion.center_x = sprite.center_x
         explosion.center_y = sprite.center_y
         explosion.update()

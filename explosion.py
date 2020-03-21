@@ -4,8 +4,8 @@ import arcade
 
 
 class Explosion(arcade.Sprite):
-    def __init__(self, texture_list):
-        super().__init__()
+    def __init__(self, texture_list, scale=1.0):
+        super().__init__(scale=scale)
 
     # Start at the first frame
         self.current_texture = 0
