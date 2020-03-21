@@ -24,7 +24,7 @@ class EnemyShipSprite(arcade.Sprite):
         # Target coordinate and speed.
         self.target_x = None
         self.target_y = None
-        self.speed = 1
+        self.speed = 3
 
         # Define rectangular areas off the screen to spawn enemies.
         off_screen_areas = [
@@ -67,15 +67,15 @@ class EnemyShipSprite(arcade.Sprite):
         super().update()
 
         # Aim the enemy ship at the target.
-        dx = self.center_x - self.target_x
-        dy = self.center_y - self.target_y
+        dx = self.target_x - self.center_x
+        dy = self.target_y - self.center_y
 
         # If the change in angle from the last update is greater than 10
         # degrees, limit the rate of change of angle to max 10 degrees per
         # frame. Prevents the enemy ship from instantaneously flipping if the
         # player exits the screen and appears on the other side.
         prev_angle = self.angle
-        target_angle = math.degrees(math.atan2(dy, dx)) - 90
+        target_angle = math.degrees(math.atan2(dy, dx))
 
         d_theta = prev_angle - target_angle
 
@@ -87,5 +87,5 @@ class EnemyShipSprite(arcade.Sprite):
             self.angle = target_angle
 
         # Calculate the x and y speeds based on the ship speed and angle.
-        self.change_y = math.sin(math.radians(self.angle - 90)) * self.speed
-        self.change_x = math.cos(math.radians(self.angle - 90)) * self.speed
+        self.change_y = math.sin(math.radians(self.angle)) * self.speed
+        self.change_x = math.cos(math.radians(self.angle)) * self.speed

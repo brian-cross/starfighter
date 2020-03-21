@@ -30,10 +30,9 @@ class App(arcade.Window):
         self.laser_sprite_list = arcade.SpriteList()
         self.explosion_sprite_list = arcade.SpriteList()
 
-        # Load the spritesheet for the explosion animation
-        self.explosion_texture_list = arcade.load_spritesheet(constants.EXPLOSION_FILENAME,
-                                                              constants.EXPLOSION_SPRITESHEET_WIDTH, constants.EXPLOSION_SPRITESHEET_HEIGHT,
-                                                              constants.EXPLOSION_SPRITESHEET_COLUMNS, constants.EXPLOSION_SPRITESHEET_COUNT)
+        # Load the explosion spritesheet here to prevent a delay in the
+        # explosion animation.
+        Explosion.load_spritesheet()
 
     def setup(self):
         # Create the background and star field.
@@ -65,7 +64,11 @@ class App(arcade.Window):
             enemy_ship.target_x = self.player_ship.center_x
             enemy_ship.target_y = self.player_ship.center_y
 
-        self.check_for_collisions()
+        # Check if any sprites have collided
+        self.check_for_list_collisions(
+            self.enemy_ships_sprite_list, self.laser_sprite_list)
+        self.check_for_sprite_collision_with_list(
+            self.player_ship, self.enemy_ships_sprite_list)
 
         # Update everything on each frame.
         self.all_sprites_list.update()
@@ -125,23 +128,30 @@ class App(arcade.Window):
         self.all_sprites_list.insert(0, laser)
         self.laser_sprite_list.append(laser)
 
-    def check_for_collisions(self):
-        # See if a laser hits an enemy ship.
-        for laser in self.laser_sprite_list:
-            hit_list = laser.collides_with_list(self.enemy_ships_sprite_list)
+    def check_for_list_collisions(self, list_1, list_2):
+        # If a sprite in the first list collides with a sprite in the second
+        # list, trigger an explosion and remove both sprites from their
+        # respective lists.
+        for sprite in list_1:
+            hit_list = sprite.collides_with_list(list_2)
             if (len(hit_list) > 0):
-                self.make_explosion(hit_list[0])
-                laser.remove_from_sprite_lists()
+                self.make_explosion(hit_list[0], constants.SPRITE_SCALING)
+                sprite.remove_from_sprite_lists()
                 for hit in hit_list:
                     hit.remove_from_sprite_lists()
 
-    def make_explosion(self, sprite):
+    def check_for_sprite_collision_with_list(self, sprite, list):
+        hit_list = sprite.collides_with_list(list)
+        if (len(hit_list) > 0):
+            self.make_explosion(hit_list[0])
+            sprite.remove_from_sprite_lists()
+            for hit in hit_list:
+                hit.remove_from_sprite_lists()
+
+    def make_explosion(self, sprite, scaling=1.0):
         # Create an explosion at the location of the specified sprite.
-        explosion = Explosion(self.explosion_texture_list,
-                              constants.SPRITE_SCALING)
-        explosion.center_x = sprite.center_x
-        explosion.center_y = sprite.center_y
-        explosion.update()
+        explosion = Explosion(
+            sprite.center_x, sprite.center_y, scaling)
         self.explosion_sprite_list.append(explosion)
 
 
