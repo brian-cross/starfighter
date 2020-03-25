@@ -11,7 +11,9 @@ ENEMY_SHIP_SCALING = SPRITE_SCALING
 # Player ship motion properties
 PLAYER_SHIP_THRUST = 0.3
 PLAYER_SHIP_DRAG = 0.1
-PLAYER_LASER_SPEED = 10
+
+# Laser properties
+LASER_SPEED = 10
 
 # Spritesheet properites
 EXPLOSION_SPRITESHEET_COLUMNS = 4

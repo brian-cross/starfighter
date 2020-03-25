@@ -25,7 +25,7 @@ class App(arcade.Window):
         self.is_right_pressed = False
 
         # Setup sprite lists.
-        self.all_sprites_list = arcade.SpriteList()
+        self.player_ship_sprite_list = arcade.SpriteList()
         self.enemy_ships_sprite_list = arcade.SpriteList()
         self.laser_sprite_list = arcade.SpriteList()
         self.explosion_sprite_list = arcade.SpriteList()
@@ -39,57 +39,68 @@ class App(arcade.Window):
         self.background = Starfield(self.width, self.height)
 
         # Create the player ship.
-        self.player_ship = PlayerShipSprite(
-            constants.PLAYER_SHIP_FILENAME, constants.PLAYER_SHIP_SCALING)
+        self.create_ship('player')
 
         # Create an enemy ship.
-        self.enemy_ship = EnemyShipSprite(scale=constants.ENEMY_SHIP_SCALING)
-        self.enemy_ships_sprite_list.append(self.enemy_ship)
-
-        # Add the sprites to the list to be drawn in a bottom to top order.
-        self.all_sprites_list.append(self.enemy_ship)
-        self.all_sprites_list.append(self.player_ship)
+        self.create_ship('enemy')
 
     def on_draw(self):
         # Draws everything to the screen.
         arcade.start_render()
 
         self.background.draw()
-        self.all_sprites_list.draw()
+        self.laser_sprite_list.draw()
+        self.enemy_ships_sprite_list.draw()
+        self.player_ship_sprite_list.draw()
         self.explosion_sprite_list.draw()
 
     def on_update(self, delta_time):
+
+        # If a laser hits an enemy ship trigger a small explosion and spawn a
+        # new enemy.
+        location = self.check_for_list_collisions(
+            self.laser_sprite_list, self.enemy_ships_sprite_list)
+        if (location != None):
+            self.make_explosion(location, scaling=constants.SPRITE_SCALING)
+            self.create_ship('enemy')
+
+        # If the player ship collides with an enemy ship trigger a big explosion
+        # and spawn a new player and enemy.
+        location = self.check_for_list_collisions(
+            self.player_ship_sprite_list, self.enemy_ships_sprite_list)
+        if (location != None):
+            self.make_explosion(location)
+            self.create_ship('player')
+            self.create_ship('enemy')
+
         # Update the enemy ships with the player ship's current location.
         for enemy_ship in self.enemy_ships_sprite_list:
             enemy_ship.target_x = self.player_ship.center_x
             enemy_ship.target_y = self.player_ship.center_y
 
-        # Check if any sprites have collided
-        self.check_for_list_collisions(
-            self.enemy_ships_sprite_list, self.laser_sprite_list)
-        self.check_for_sprite_collision_with_list(
-            self.player_ship, self.enemy_ships_sprite_list)
-
         # Update everything on each frame.
-        self.all_sprites_list.update()
+        self.laser_sprite_list.update()
+        self.enemy_ships_sprite_list.update()
+        self.player_ship_sprite_list.update()
         self.explosion_sprite_list.update()
 
     def on_key_press(self, key, modifiers):
-        # Handle keyboard presses.
-        if (key == arcade.key.W or key == arcade.key.UP):
-            self.player_ship.thrust = constants.PLAYER_SHIP_THRUST
-        elif (key == arcade.key.S or key == arcade.key.DOWN):
-            self.player_ship.thrust = -constants.PLAYER_SHIP_THRUST
-        elif (key == arcade.key.A or key == arcade.key.LEFT):
-            # Persist the state of the left turning key
-            self.is_left_pressed = True
-            self.player_ship.change_angle = 3
-        elif (key == arcade.key.D or key == arcade.key.RIGHT):
-            # Persist the state of the right turning key
-            self.is_right_pressed = True
-            self.player_ship.change_angle = -3
-        elif (key == arcade.key.ENTER):
-            self.fire_weapon()
+        # Ignore keyboard input if the player ship is spawning.
+        if(self.player_ship.spawning == False):
+            if (key == arcade.key.W or key == arcade.key.UP):
+                self.player_ship.thrust = constants.PLAYER_SHIP_THRUST
+            elif (key == arcade.key.S or key == arcade.key.DOWN):
+                self.player_ship.thrust = -constants.PLAYER_SHIP_THRUST
+            elif (key == arcade.key.A or key == arcade.key.LEFT):
+                # Persist the state of the left turning key
+                self.is_left_pressed = True
+                self.player_ship.change_angle = 3
+            elif (key == arcade.key.D or key == arcade.key.RIGHT):
+                # Persist the state of the right turning key
+                self.is_right_pressed = True
+                self.player_ship.change_angle = -3
+            elif (key == arcade.key.ENTER):
+                self.fire_weapon(self.player_ship)
 
     def on_key_release(self, key, modifiers):
         # Handles the key release event.
@@ -113,46 +124,60 @@ class App(arcade.Window):
             self.player_ship.thrust = 0
             self.player_ship.drag = constants.PLAYER_SHIP_DRAG
 
-    def fire_weapon(self):
+    def fire_weapon(self, ship):
         # Break the laws of physics by adding the speed of the ship to the
         # speed of the laser. (Looks better than having a constant laser speed)
-        laser_speed = self.player_ship.speed + constants.PLAYER_LASER_SPEED
-        laser = Laser(constants.ENEMY_LASER_FILENAME,
-                      self.player_ship.center_x,
-                      self.player_ship.center_y,
-                      laser_speed,
-                      self.player_ship.angle)
+        laser_speed = ship.speed + constants.LASER_SPEED
 
-        # Insert the sprite at the start of the list so it's drawn under the
-        # ships.
-        self.all_sprites_list.insert(0, laser)
+        # Adjust the laser position a little toward the front of the ship.
+        x_offset = math.cos(math.radians(ship.angle)) * 20
+        y_offset = math.sin(math.radians(ship.angle)) * 20
+
+        laser = Laser(constants.ENEMY_LASER_FILENAME,
+                      ship.center_x + x_offset,
+                      ship.center_y + y_offset,
+                      laser_speed,
+                      ship.angle)
+
         self.laser_sprite_list.append(laser)
 
     def check_for_list_collisions(self, list_1, list_2):
         # If a sprite in the first list collides with a sprite in the second
-        # list, trigger an explosion and remove both sprites from their
-        # respective lists.
+        # list, remove both sprites from their respective lists. Return the
+        # location of the sprite in the second list or None if there was no
+        # collision.
+        location = None
+
         for sprite in list_1:
             hit_list = sprite.collides_with_list(list_2)
             if (len(hit_list) > 0):
-                self.make_explosion(hit_list[0], constants.SPRITE_SCALING)
+                x = hit_list[0].center_x
+                y = hit_list[0].center_y
                 sprite.remove_from_sprite_lists()
                 for hit in hit_list:
                     hit.remove_from_sprite_lists()
+                location = (x, y)
 
-    def check_for_sprite_collision_with_list(self, sprite, list):
-        hit_list = sprite.collides_with_list(list)
-        if (len(hit_list) > 0):
-            self.make_explosion(hit_list[0])
-            sprite.remove_from_sprite_lists()
-            for hit in hit_list:
-                hit.remove_from_sprite_lists()
+        return location
 
-    def make_explosion(self, sprite, scaling=1.0):
-        # Create an explosion at the location of the specified sprite.
+    def make_explosion(self, location, scaling=1.0):
+        # Create an explosion at the specified x y location.
         explosion = Explosion(
-            sprite.center_x, sprite.center_y, scaling)
+            location[0], location[1], scaling)
         self.explosion_sprite_list.append(explosion)
+
+    def create_ship(self, ship_type=''):
+        if (ship_type == ''):
+            return
+
+        if (ship_type == 'player'):
+            self.player_ship = PlayerShipSprite(
+                constants.PLAYER_SHIP_FILENAME, constants.PLAYER_SHIP_SCALING)
+            self.player_ship_sprite_list.append(self.player_ship)
+        elif (ship_type == 'enemy'):
+            self.enemy_ship = EnemyShipSprite(
+                scale=constants.ENEMY_SHIP_SCALING)
+            self.enemy_ships_sprite_list.append(self.enemy_ship)
 
 
 if __name__ == "__main__":

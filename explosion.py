@@ -21,7 +21,7 @@ class Explosion(arcade.Sprite):
         self.textures = Explosion.texture_list
 
     def update(self):
-        # Run through each frame and then remove the sprite.
+        # Run through each frame and then remove the sprite when done.
         if self.current_texture < len(self.textures):
             self.set_texture(self.current_texture)
             self.current_texture += 1

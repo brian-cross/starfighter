@@ -24,7 +24,7 @@ class EnemyShipSprite(arcade.Sprite):
         # Target coordinate and speed.
         self.target_x = None
         self.target_y = None
-        self.speed = 3
+        self.speed = 2
 
         # Define rectangular areas off the screen to spawn enemies.
         off_screen_areas = [
