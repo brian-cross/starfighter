@@ -86,15 +86,15 @@ class App(arcade.Window):
     def on_key_press(self, key, modifiers):
         # Ignore keyboard input if the player ship is spawning.
         if(self.player_ship.spawning == False):
-            if (key == arcade.key.W or key == arcade.key.UP):
+            if (key == arcade.key.W):
                 self.player_ship.thrust = constants.PLAYER_SHIP_THRUST
-            elif (key == arcade.key.S or key == arcade.key.DOWN):
+            elif (key == arcade.key.S):
                 self.player_ship.thrust = -constants.PLAYER_SHIP_THRUST
-            elif (key == arcade.key.A or key == arcade.key.LEFT):
+            elif (key == arcade.key.A):
                 # Persist the state of the left turning key
                 self.is_left_pressed = True
                 self.player_ship.change_angle = 3
-            elif (key == arcade.key.D or key == arcade.key.RIGHT):
+            elif (key == arcade.key.D):
                 # Persist the state of the right turning key
                 self.is_right_pressed = True
                 self.player_ship.change_angle = -3
@@ -106,20 +106,20 @@ class App(arcade.Window):
         # If the left or right turn keys have been released, check if the other
         # turning key is still pressed. If so, turn the ship in the other
         # direction. Otherwise stop turning.
-        if (key == arcade.key.A or key == arcade.key.LEFT):
+        if (key == arcade.key.A):
             self.is_left_pressed = False
             if (self.is_right_pressed):
                 self.player_ship.change_angle = -3
             else:
                 self.player_ship.change_angle = 0
-        elif (key == arcade.key.D or key == arcade.key.RIGHT):
+        elif (key == arcade.key.D):
             self.is_right_pressed = False
             if (self.is_left_pressed):
                 self.player_ship.change_angle = 3
             else:
                 self.player_ship.change_angle = 0
         # Kill the ship's thrust if the forward or backward keys are released.
-        elif (key == arcade.key.W or key == arcade.key.UP or key == arcade.key.S or key == arcade.key.DOWN):
+        elif (key == arcade.key.W or key == arcade.key.S):
             self.player_ship.thrust = 0
             self.player_ship.drag = constants.PLAYER_SHIP_DRAG
 
@@ -129,12 +129,12 @@ class App(arcade.Window):
         laser_speed = ship.speed + constants.LASER_SPEED
 
         # Adjust the laser position a little toward the front of the ship.
-        x_offset = math.cos(math.radians(ship.angle)) * 20
-        y_offset = math.sin(math.radians(ship.angle)) * 20
+        x = ship.center_x + math.cos(math.radians(ship.angle)) * 20
+        y = ship.center_y + math.sin(math.radians(ship.angle)) * 20
 
+        # Create the laser object.
         laser = Laser(constants.ENEMY_LASER_FILENAME,
-                      ship.center_x + x_offset,
-                      ship.center_y + y_offset,
+                      (x, y),
                       laser_speed,
                       ship.angle)
 
@@ -157,7 +157,7 @@ class App(arcade.Window):
 
         return position
 
-    def make_explosion(self, position, scaling=1.0):
+    def make_explosion(self, position, scaling=1):
         # Create an explosion at the specified x y position.
         explosion = Explosion(position, scaling)
         self.explosion_sprite_list.append(explosion)

@@ -9,12 +9,10 @@ class Explosion(arcade.Sprite):
     # A list to hold the animation frames.
     texture_list = []
 
-    def __init__(self, position, scale=1.0):
+    def __init__(self, position, scale=1):
         super().__init__(scale=scale)
 
         # Set the explosion location.
-        # self.center_x = center_x
-        # self.center_y = center_y
         self.position = position
 
         # Initialize the current texture to the first animation frame.
