@@ -7,9 +7,10 @@ import math
 import os
 
 import constants
+from vector_sprite import VectorSprite
 
 
-class EnemyShipSprite(arcade.Sprite):
+class EnemyShipSprite(VectorSprite):
     def __init__(self, scale=1.0):
         # Grab the list of sprites from the directory.
         enemy_ship_list = os.listdir(constants.ENEMY_SPRITES_DIR)
@@ -85,7 +86,3 @@ class EnemyShipSprite(arcade.Sprite):
             self.angle += -10
         else:
             self.angle = target_angle
-
-        # Calculate the x and y speeds based on the ship speed and angle.
-        self.change_y = math.sin(math.radians(self.angle)) * self.speed
-        self.change_x = math.cos(math.radians(self.angle)) * self.speed

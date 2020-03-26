@@ -55,25 +55,24 @@ class App(arcade.Window):
         self.explosion_sprite_list.draw()
 
     def on_update(self, delta_time):
-
         # If a laser hits an enemy ship trigger a small explosion and spawn a
         # new enemy.
-        location = self.check_for_list_collisions(
+        position = self.check_for_list_collisions(
             self.laser_sprite_list, self.enemy_ships_sprite_list)
-        if (location != None):
-            self.make_explosion(location, scaling=constants.SPRITE_SCALING)
+        if (position != None):
+            self.make_explosion(position, scaling=constants.SPRITE_SCALING)
             self.create_ship('enemy')
 
         # If the player ship collides with an enemy ship trigger a big explosion
         # and spawn a new player and enemy.
-        location = self.check_for_list_collisions(
+        position = self.check_for_list_collisions(
             self.player_ship_sprite_list, self.enemy_ships_sprite_list)
-        if (location != None):
-            self.make_explosion(location)
+        if (position != None):
+            self.make_explosion(position)
             self.create_ship('player')
             self.create_ship('enemy')
 
-        # Update the enemy ships with the player ship's current location.
+        # Update the enemy ships with the player ship's current position.
         for enemy_ship in self.enemy_ships_sprite_list:
             enemy_ship.target_x = self.player_ship.center_x
             enemy_ship.target_y = self.player_ship.center_y
@@ -144,26 +143,23 @@ class App(arcade.Window):
     def check_for_list_collisions(self, list_1, list_2):
         # If a sprite in the first list collides with a sprite in the second
         # list, remove both sprites from their respective lists. Return the
-        # location of the sprite in the second list or None if there was no
+        # position of the sprite in the second list or None if there was no
         # collision.
-        location = None
+        position = None
 
         for sprite in list_1:
             hit_list = sprite.collides_with_list(list_2)
             if (len(hit_list) > 0):
-                x = hit_list[0].center_x
-                y = hit_list[0].center_y
+                position = hit_list[0].position
                 sprite.remove_from_sprite_lists()
                 for hit in hit_list:
                     hit.remove_from_sprite_lists()
-                location = (x, y)
 
-        return location
+        return position
 
-    def make_explosion(self, location, scaling=1.0):
-        # Create an explosion at the specified x y location.
-        explosion = Explosion(
-            location[0], location[1], scaling)
+    def make_explosion(self, position, scaling=1.0):
+        # Create an explosion at the specified x y position.
+        explosion = Explosion(position, scaling)
         self.explosion_sprite_list.append(explosion)
 
     def create_ship(self, ship_type=''):
